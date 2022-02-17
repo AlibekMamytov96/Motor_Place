@@ -1,0 +1,10 @@
+Django==3.1
+psycopg2-binary
+Pillow
+djangorestframework
+python-decouple
+django-phonenumber-field
+phonenumbers
+twilio
+djangorestframework-simplejwt
+drf-yasg
