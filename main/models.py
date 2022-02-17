@@ -46,7 +46,7 @@ class Car(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'{self.title} - {self.yeat}'
+        return f'{self.title} - {self.year}'
 
     class Meta:
         ordering = ['-created']
@@ -62,9 +62,12 @@ class Comment(models.Model):
     author = models.ForeignKey(MyUser, on_delete=models.DO_NOTHING, related_name='comments')
     car = models.ForeignKey(Car, on_delete=models.CASCADE, related_name='comments')
     created = models.DateTimeField(auto_now_add=True)
+    # likes = models.ManyToManyField(MyUser, related_name='likers', blank=True)
 
     def __str__(self):
         return self.comment
 
     class Meta:
         ordering = ['-created']
+
+

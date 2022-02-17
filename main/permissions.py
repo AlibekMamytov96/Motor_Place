@@ -1,21 +1,7 @@
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import BasePermission
 
 
-class IsSeller(IsAuthenticated):
-    def has_permission(self, request, view):
-        is_authenticated = super().has_permission(request, view)
+class IsAuthorPermission(BasePermission):
 
-        if not is_authenticated:
-            return False
-
-        return request.user.isSeller
-
-
-class IsBuyer(IsAuthenticated):
-    def has_permission(self, request, view):
-        is_authenticated = super().has_permission(request, view)
-
-        if not is_authenticated:
-            return False
-
-        return request.user.isBuyer
+    def has_object_permission(self, request, view, obj):
+        return request.user.is_authenticated and request.user == obj.author

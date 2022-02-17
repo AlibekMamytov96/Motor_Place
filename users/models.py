@@ -36,12 +36,10 @@ class MyUser(AbstractUser):
     email = models.EmailField(unique=True)
     is_active = models.BooleanField(default=False)
     activation_code = models.CharField(max_length=50, blank=True)
-    isBuyer = models.BooleanField(default=False)
-    isSeller = models.BooleanField(default=False)
 
     EMAIL_FIELD = 'email'
     USERNAME_FIELD = 'phone_number'
-    REQUIRED_FIELDS = ['username', 'email', 'isBuyer', 'isSeller']
+    REQUIRED_FIELDS = ['username', 'email', ]
 
     objects = MyUserManager()
 
@@ -57,16 +55,3 @@ class MyUser(AbstractUser):
         activation_code = md5_object.hexdigest()
         self.activation_code = activation_code
 
-
-class Buyer(models.Model):
-    user = models.OneToOneField(MyUser, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.user.username
-
-
-class Seller(models.Model):
-    user = models.OneToOneField(MyUser, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.user.username

@@ -24,9 +24,11 @@ from main.views import *
 router = DefaultRouter()
 router.register('cars', CarViewSet)
 router.register('comments', CommentViewSet)
+router.register('brands', BrandViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('v1/api/', include(router.urls)),
+    path('v1/api/add-image/', CarImageView.as_view()),
     path('v1/api/users/', include('users.urls')),
+    path('v1/api/', include(router.urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

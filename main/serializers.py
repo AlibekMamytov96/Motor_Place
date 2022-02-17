@@ -49,7 +49,7 @@ class CarSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['images'] = CarImageSerializer(instance.images.all(), many=True).data
-        representation['likes'] = instance.likes.count()
+        # representation['likes'] = instance.likes.count()
         action = self.context.get('action')
         if action == 'list':
             representation['comments'] = instance.comments.count()
@@ -61,6 +61,7 @@ class CarSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.ReadOnlyField(source='author.username')
+    created_at = serializers.DateTimeField(format='%d/%m/%Y %H:%M:%S', read_only=True)
 
     class Meta:
         model = Comment
@@ -70,12 +71,32 @@ class CommentSerializer(serializers.ModelSerializer):
         author = self.context.get('request').user
         comment = Comment.objects.create(author=author, **validated_data)
         return comment
+    #
+    # def to_representation(self, instance):
+    #     representation = super().to_representation(instance)
+    #     representation['likes'] = instance.likes.count()
+    #     return representation
 
 
-class ImageSerializer(serializers.ModelSerializer):
+class CarImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = CarImage
         fields = '__all__'
+
+    def _get_image_url(self, obj):
+        if obj.image:
+            url = obj.image.url
+            request = self.context.get('request')
+            if request is not None:
+                url = request.build_absolute_uri(url)
+        else:
+            url = ''
+        return url
+
+    def to_representation(self, instance):
+        represantation = super().to_representation(instance)
+        represantation['image'] = self._get_image_url(instance)
+        return represantation
 
 
 class BrandSerializer(serializers.ModelSerializer):
