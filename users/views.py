@@ -1,4 +1,4 @@
-from django.contrib.auth import get_user_model
+
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.authtoken.models import Token
@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .serializers import RegisterSerializer
+from .serializers import *
 
 
 class RegisterView(APIView):
@@ -31,19 +31,6 @@ class ActivateView(APIView):
         return Response('Your account successfully activated!', status=status.HTTP_200_OK)
 
 
-# class LoginView(ObtainAuthToken):
-#     serializer_class = LoginSerializer
-#
-#
-# class LogoutView(APIView):
-#     permission_classes = [IsAuthenticated, ]
-#
-#     def post(self, request):
-#         user = request.user
-#         Token.objects.filter(user=user).delete()
-#         return Response('Successfully logged out!', status=status.HTTP_200_OK)
-
-
 class LogoutView(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -56,3 +43,4 @@ class LogoutView(APIView):
             return Response(status=status.HTTP_205_RESET_CONTENT)
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+

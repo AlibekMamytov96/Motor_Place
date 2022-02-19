@@ -62,7 +62,6 @@ class Comment(models.Model):
     author = models.ForeignKey(MyUser, on_delete=models.DO_NOTHING, related_name='comments')
     car = models.ForeignKey(Car, on_delete=models.CASCADE, related_name='comments')
     created = models.DateTimeField(auto_now_add=True)
-    # likes = models.ManyToManyField(MyUser, related_name='likers', blank=True)
 
     def __str__(self):
         return self.comment
@@ -70,4 +69,18 @@ class Comment(models.Model):
     class Meta:
         ordering = ['-created']
 
+
+class Likes(models.Model):
+    likes = models.BooleanField(default=False)
+    car = models.ForeignKey(Car, on_delete=models.CASCADE, related_name='likes')
+    author = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='likes')
+
+    def __str__(self):
+        return str(self.likes)
+
+
+class Favorite(models.Model):
+    car = models.ForeignKey(Car, on_delete=models.CASCADE, related_name='favourites')
+    user = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='favourites')
+    favorite = models.BooleanField(default=True)
 

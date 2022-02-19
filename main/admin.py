@@ -16,3 +16,5 @@ class CarAdmin(admin.ModelAdmin):
 
 admin.site.register(Brand)
 admin.site.register(Comment)
+admin.site.register(Likes)
+admin.site.register(Favorite)

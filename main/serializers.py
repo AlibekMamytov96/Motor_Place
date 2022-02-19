@@ -1,22 +1,6 @@
 from rest_framework import serializers
 
-from .models import Car, CarImage, Comment, Brand
-
-
-class CarImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CarImage
-        fields = ('image', )
-
-    def _get_image_url(self, instance):
-        if instance.image:
-            url = instance.image.url
-            return 'localhost:8000' + url
-
-    def to_representation(self, instance):
-        representation = super(CarImageSerializer, self).to_representation(instance)
-        representation['image'] = self._get_image_url(instance)
-        return representation
+from .models import Car, CarImage, Comment, Brand, Likes, Favorite
 
 
 class CarSerializer(serializers.ModelSerializer):
@@ -49,33 +33,13 @@ class CarSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['images'] = CarImageSerializer(instance.images.all(), many=True).data
-        # representation['likes'] = instance.likes.count()
+        representation['likes'] = instance.likes.count()
         action = self.context.get('action')
-        if action == 'list':
-            representation['comments'] = instance.comments.count()
-        else:
-
-            representation['comments'] = CommentSerializer(instance.comments.all(), many=True).data
+        # if action == 'list':
+        #     representation['comments'] = instance.comments.count()
+        # else:
+        representation['comments'] = CommentSerializer(instance.comments.all(), many=True).data
         return representation
-
-
-class CommentSerializer(serializers.ModelSerializer):
-    author = serializers.ReadOnlyField(source='author.username')
-    created_at = serializers.DateTimeField(format='%d/%m/%Y %H:%M:%S', read_only=True)
-
-    class Meta:
-        model = Comment
-        fields = '__all__'
-
-    def create(self, validated_data):
-        author = self.context.get('request').user
-        comment = Comment.objects.create(author=author, **validated_data)
-        return comment
-    #
-    # def to_representation(self, instance):
-    #     representation = super().to_representation(instance)
-    #     representation['likes'] = instance.likes.count()
-    #     return representation
 
 
 class CarImageSerializer(serializers.ModelSerializer):
@@ -104,5 +68,54 @@ class BrandSerializer(serializers.ModelSerializer):
         model = Brand
         fields = '__all__'
 
+
+class LikesSerializer(serializers.ModelSerializer):
+    author = serializers.ReadOnlyField(source='author.username')
+
+    class Meta:
+        model = Likes
+        fields = '__all__'
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        author = request.user
+        car = validated_data.get('car')
+        like = Likes.objects.get_or_create(author=author, car=car)[0]
+        like.likes = True if like.likes is False else False
+        like.save()
+        return like
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.ReadOnlyField(source='author.username')
+    created_at = serializers.DateTimeField(format='%d/%m/%Y %H:%M:%S', read_only=True)
+
+    class Meta:
+        model = Comment
+        fields = '__all__'
+
+    def create(self, validated_data):
+        author = self.context.get('request').user
+        comment = Comment.objects.create(author=author, **validated_data)
+        return comment
+
+
+class FavoriteSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Favorite
+        fields = '__all__'
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['user'] = instance.user.email
+        representation['car'] = instance.car.title
+        return representation
+
+
+class ParsingSerializer(serializers.Serializer):
+    title = serializers.CharField(max_length=255)
+    price = serializers.CharField(max_length=255)
+    image = serializers.CharField(max_length=255)
 
 
